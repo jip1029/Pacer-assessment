@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link Extractor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="imgContainer">
+      <img src="/stormy.jpeg" />
+    </div>
+    <div class="container">
+      <h1>⚙️ Link Extractor ⚙️</h1>
+
+      <form>
+        <label for="url">URL:</label>
+        <input type="text" name="url" id="url" />
+        <br /><br />
+        <input type="submit" value="EXTRACT" />
+      </form>
+      <ul id="link-list"></ul>
+      <div id="rain-container"></div>
+    </div>
+    <script>
+      const form = document.querySelector('form');
+      const input = document.querySelector('#url');
+      const list = document.querySelector('#link-list');
+      const rainContainer = document.querySelector('#rain-container');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        list.innerHTML = '';
+        const url = input.value;
+        fetch(`/url?url=${encodeURIComponent(url)}`)
+          .then((response) => response.json())
+          .then((data) => {
+            for (const link of data.links) {
+              const linkElem = document.createElement('div');
+              const listElem = document.createElement('li');
+              listElem.classList.add('listElem');
+              listElem.textContent = link;
+              linkElem.classList.add('link');
+              linkElem.style.left = `${Math.random() * 100}%`;
+              linkElem.textContent = link;
+              list.appendChild(listElem);
+              rainContainer.appendChild(linkElem);
+
+              const animation = linkElem.animate(
+                [
+                  { transform: `translateY(-50vh)` },
+                  { transform: `translateY(120vh)` },
+                ],
+                {
+                  duration: 3000 + Math.random() * 4000,
+                  delay: Math.random() * 4000,
+                }
+              );
+
+              animation.onfinish = () => {
+                rainContainer.removeChild(linkElem);
+              };
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            const message = document.createElement('li');
+            message.textContent = 'Error: Unable to retrieve web page.';
+            list.appendChild(message);
+          });
+      });
+    </script>
+  </body>
+</html>
